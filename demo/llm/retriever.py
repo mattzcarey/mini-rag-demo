@@ -11,7 +11,7 @@ from demo.constants.settings import SETTINGS
 
 
 @st.cache_resource(ttl="1h")
-def configure_retriever(uploaded_files, embeddings_provider):
+def configure_retriever(uploaded_files, model_provider):
     # Read documents
     docs = []
     temp_dir = tempfile.TemporaryDirectory()
@@ -27,12 +27,12 @@ def configure_retriever(uploaded_files, embeddings_provider):
     splits = text_splitter.split_documents(docs)
 
     # Embeddings
-    if embeddings_provider == "openai":
+    if model_provider == "OpenAI":
         embeddings = OpenAIEmbeddings(openai_api_key=SETTINGS.openai_api_key.get_secret_value())
-    elif embeddings_provider == "bedrock":
+    elif model_provider == "Amazon Bedrock":
         embeddings = BedrockEmbeddings(region_name="us-east-1") # type: ignore
     else:
-        raise ValueError(f"Unknown embeddings provider: {embeddings_provider}")
+        raise ValueError(f"Unknown embeddings provider: {model_provider}")
 
     # Store in vectordb
     vector_db = Chroma.from_documents(splits, embeddings)
